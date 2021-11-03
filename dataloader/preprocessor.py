@@ -36,7 +36,7 @@ class SentencePre:
             self.max_length = max_length
 
     def init_data(self, data_path):
-        if data_path[0][-4: ] == ".pth":
+        if data_path[-4: ] == ".pth":
             self.data = torch.load(data_path)
         else:
             # data_path must be npy with format of 
@@ -128,8 +128,9 @@ class SentencePre:
         in: {"x": , "y": , "id": }
         out: {"input_ids":, "token_type_ids":, "attention_mask":, "offset_mapping":, "labels":, "length":}
         """
+        data_x = [[i] for i in data["x"]]
         data_x = self.tokenizer(
-            data["x"],
+            data_x,
             is_split_into_words = True, 
             return_offsets_mapping= True,
             padding = padding,
@@ -147,7 +148,7 @@ class SentencePre:
         }
         # if there is y
         if "y" in data:
-            new_data["labels"] = torch.tensor(data["y"], dtype=torch.long)
+            new_data["labels"] = torch.tensor(data["y"], dtype=torch.float)
         return new_data
     
     @property

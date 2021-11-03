@@ -15,7 +15,7 @@ from utils.logger import init_logger
 default_config = {
     # path
     "data_cls": SentencePre,   # 模型训练用到的预处理类
-    "data_folder_name": "product/data/pre_data.npy",   # 原始数据位置 
+    "data_folder_name": "product/data/data.pth",   # 原始数据位置 
     "folder_path": "product/experiments/sentence1/",    # 本次实验log，checkpoint的保存位置
     # model
     "model_name": "bert-base-chinese",  # 用于选择使用哪一款bert模型
