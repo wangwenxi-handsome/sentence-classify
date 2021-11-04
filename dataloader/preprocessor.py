@@ -18,7 +18,6 @@ class SentencePre:
     ):
         # token relate
         self.tokenizer = BertTokenizerFast.from_pretrained(model_name, do_lower_case = True)
-        print(self.tokenizer)
         self.tag2id = dict(zip(self.tag, range(len(self.tag))))
         self.id2tag = self.tag
 
@@ -190,22 +189,22 @@ class SentencePre:
         return self.data["list"][name]["x"]
 
     def get_raw_data_y(self, name):
-        return self.data["list"][name]["y"]
+        return self.data["list"][name].get("y", None)
 
     def get_raw_data_id(self, name):
-        return self.data["list"][name]["id"]
+        return self.data["list"][name].get("id", None)
 
     def get_tokenize_length(self, name):
         return self.data["tensor"][name]["length"]
 
     def decode(self, model_output, threshold = 0):
         # process outputs
-        outputs = model_output.numpy().tolist()
-        new_outputs = []
-        for i in outputs:
-            new_outputs.extend(i)
+        outputs = []
+        for o in model_output:
+            outputs.extend(o.numpy().tolist())
+            
         label_output = []
-        for i in new_outputs:
+        for i in outputs:
             tmp = []
             for j in i:
                 if j >= threshold:
@@ -214,3 +213,24 @@ class SentencePre:
                     tmp.append(0)
             label_output.append(tmp)
         return label_output
+    
+    def save_results(self, sentence, outputs, file_path, labels = None):
+        with open(file_path, "w") as f:
+            for i in range(len(sentence)):
+                f.write(sentence[i])
+                f.write("\r\n")
+                
+                if labels is not None:
+                    f.write("real labels: ")
+                    for id, l in enumerate(labels[i]):
+                        if l == 1:
+                            f.write(self.id2tag[id] + " ")
+                    f.write("\r\n")
+                    
+                f.write("predict labels: ")
+                for id, l in enumerate(outputs[i]):
+                    if l == 1:
+                        f.write(self.id2tag[id] + " ")
+                f.write("\r\n")
+                
+                f.write("\r\n")

@@ -26,9 +26,10 @@ default_config = {
     "batch_size_per_gpu": 48,   # 每张显卡上的batch_size
     "save_step_rate": 0.1,  # 每训练多少百分比保存一个checkpoint
     # main
-    "if_train": True,
-    "if_select": True,
+    "if_train": False,
+    "if_select": False,
     "if_test": True,
+    "if_save_result": True,
 }
 
 
@@ -84,7 +85,7 @@ def select(logger, config, data_gen, dataloader, name):
         logger.info("select by %s start with %s", name, checkpoint)
         device, model = get_torch_model(
             SentenceMutilabel, 
-            model_config = {"model_name": config["model_name"], "loss_func": "ce", "label_num": config["label_num"]},
+            model_config = {"model_name": config["model_name"], "label_num": config["label_num"]},
             load_checkpoint_path = checkpoint,
         )
 
@@ -94,11 +95,7 @@ def select(logger, config, data_gen, dataloader, name):
         )
 
         outputs, _ = trainer.rollout(dataloader)
-        outputs = data_gen.decode(
-            outputs, 
-            data_gen.get_tokenize_length(name), 
-            data_gen.get_raw_data_y(name),
-        )
+        outputs = data_gen.decode(outputs)
         metric = classification_report(outputs, data_gen.get_raw_data_y(name), output_dict = True)
         metrics.append(metric)
         logger.info("i result %s", metric)
@@ -130,7 +127,7 @@ def select(logger, config, data_gen, dataloader, name):
 def test(logger, config, data_gen, dataloader, name, checkpoint):
     device, model = get_torch_model(
         SentenceMutilabel, 
-        model_config = {"model_name": config["model_name"], "loss_func": "ce", "label_num": config["label_num"]},
+        model_config = {"model_name": config["model_name"], "label_num": config["label_num"]},
         load_checkpoint_path = checkpoint,
     )
 
@@ -140,13 +137,18 @@ def test(logger, config, data_gen, dataloader, name, checkpoint):
     )
 
     outputs, _ = trainer.rollout(dataloader)
-    outputs = data_gen.decode(
+    outputs = data_gen.decode(outputs)
+    if data_gen.get_raw_data_y(name) is not None:
+        metric = classification_report(outputs, data_gen.get_raw_data_y(name), output_dict = True)
+        logger.info("test metric is %s", metric)
+    
+    if config["if_save_result"]:
+        data_gen.save_results(
+            data_gen.get_raw_data_x(name), 
             outputs, 
-            data_gen.get_tokenize_length(name), 
+            os.path.join(config["folder_path"], "result.txt"), 
             data_gen.get_raw_data_y(name),
         )
-    metric = classification_report(outputs, data_gen.get_raw_data_y(name), output_dict = True)
-    logger.info("test metric is %s", metric)
 
 
 def run_sentence_classify(config):

@@ -155,7 +155,7 @@ class Worker:
                     loss_sum = loss
                 else:
                     loss_sum += loss
-            pbar(step)
+            pbar(step)            
         self.model.train()
         
         # return outputs and loss(None is no labels)
