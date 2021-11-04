@@ -11,7 +11,7 @@ from utils.torch_related import get_linear_schedule_with_warmup
 from utils.logger import init_logger
 
 
-# defalut kwargs for NER
+# defalut kwargs
 default_config = {
     # path
     "data_cls": SentencePre,   # 模型训练用到的预处理类
