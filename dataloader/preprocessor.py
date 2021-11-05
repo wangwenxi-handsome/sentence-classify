@@ -215,7 +215,9 @@ class SentencePre:
         return label_output
     
     def save_results(self, sentence, outputs, file_path, labels = None):
-        with open(file_path, "w") as f:
+        # file1 to show results
+        file1 = os.path.join(file_path, "results.txt")
+        with open(file1, "w") as f:
             for i in range(len(sentence)):
                 f.write(sentence[i])
                 f.write("\r\n")
@@ -234,3 +236,13 @@ class SentencePre:
                 f.write("\r\n")
                 
                 f.write("\r\n")
+        
+        # file2 to the quene
+        str_outputs = []
+        for o in outputs:
+            out_str = ""
+            for id, l in enumerate(o):
+                if l == 1:
+                    out_str += f"{self.id2tag[id]},"
+            str_outputs.append(out_str[: -1])
+        np.save(os.path.join(file_path, "results.npy"), str_outputs, allow_pickle = True)
