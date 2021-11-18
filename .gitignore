@@ -132,8 +132,6 @@ debug/
 .DS_Store
 **/.DS_Store
 **/checkpoint
-**/*.npy
-**/*.csv
 **/*.pth
 **/*.bmes
 **/log
