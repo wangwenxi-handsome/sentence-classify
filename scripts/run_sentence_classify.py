@@ -30,6 +30,9 @@ default_config = {
     "if_select": False,
     "if_test": True,
     "if_save_result": True,
+    # data
+    "dataloader_name": ["test"],
+    "split_rate": [],
 }
 
 
@@ -146,7 +149,7 @@ def test(logger, config, data_gen, dataloader, name, checkpoint):
         data_gen.save_results(
             data_gen.get_raw_data_x(name), 
             outputs, 
-            os.path.join(config["folder_path"], "result.txt"), 
+            config["folder_path"], 
             data_gen.get_raw_data_y(name),
         )
 
@@ -162,7 +165,11 @@ def run_sentence_classify(config):
     # data
     logger.info("prepare data")
     n_gpus = max(torch.cuda.device_count(), 1)
-    data_gen = config["data_cls"](model_name = config["model_name"])
+    data_gen = config["data_cls"](
+        model_name = config["model_name"],
+        dataloader_name = config["dataloader_name"],
+        split_rate = config["split_rate"],
+    )
     data_gen.init_data(data_path = config["data_folder_name"])
     dataloader = data_gen.get_dataloader(batch_size = config["batch_size_per_gpu"] * n_gpus)
     logger.info("dataloader down")
