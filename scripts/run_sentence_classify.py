@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.getcwd())
 import shutil
 import torch
 import torch.optim as optim
@@ -15,7 +17,7 @@ from utils.logger import init_logger
 default_config = {
     # path
     "data_cls": SentencePre,   # 模型训练用到的预处理类
-    "data_folder_name": "product/data/data.pth",   # 原始数据位置 
+    "data_folder_name": "product/data/pre_data.npy",   # 原始数据位置 
     "folder_path": "product/experiments/sentence1/",    # 本次实验log，checkpoint的保存位置
     # model
     "model_name": "bert-base-chinese",  # 用于选择使用哪一款bert模型
@@ -26,13 +28,13 @@ default_config = {
     "batch_size_per_gpu": 48,   # 每张显卡上的batch_size
     "save_step_rate": 0.1,  # 每训练多少百分比保存一个checkpoint
     # main
-    "if_train": False,
-    "if_select": False,
+    "if_train": True,
+    "if_select": True,
     "if_test": True,
     "if_save_result": True,
     # data
-    "dataloader_name": ["test"],
-    "split_rate": [],
+    "dataloader_name": ["train", "dev", "test"],
+    "split_rate": [0.1, 0.1], # 意味着按8:1:1划分训练集，验证集和测试集
 }
 
 

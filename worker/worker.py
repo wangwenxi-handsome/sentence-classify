@@ -86,7 +86,7 @@ class Worker:
                     else:
                         model_input[i] = None
                 output, loss = self.model(**model_input)
-                if len(loss) > 1:
+                if loss.is_cuda and len(loss) > 1:
                     loss = loss.mean()
 
                 # step
